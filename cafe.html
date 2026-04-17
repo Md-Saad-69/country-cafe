@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coffee Country — Guwahati's Finest Coffee</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d0b09;
+      --bg2:       #141009;
+      --surface:   #1c1610;
+      --surface2:  #231d13;
+      --gold:      #c9933a;
+      --gold-lt:   #e8b565;
+      --cream:     #f5edd8;
+      --cream-dim: #c4b595;
+      --text:      #e8e0d0;
+      --text-dim:  #8c7f6a;
+      --border:    rgba(201,147,58,.18);
+      --r:         14px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 99px; }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 6%;
+      background: transparent;
+      transition: background .4s, backdrop-filter .4s, padding .3s;
+    }
+    nav.scrolled {
+      background: rgba(13,11,9,.88);
+      backdrop-filter: blur(16px);
+      padding: 14px 6%;
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px; text-decoration: none;
+    }
+    .nav-logo-icon {
+      width: 38px; height: 38px; background: var(--gold);
+      border-radius: 50%; display: grid; place-items: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .nav-logo-text { font-family: 'Playfair Display', serif; font-size: 1.25rem; color: var(--cream); }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      text-decoration: none; color: var(--cream-dim); font-size: .9rem;
+      font-weight: 500; letter-spacing: .03em;
+      transition: color .25s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0;
+      width: 0; height: 1px; background: var(--gold);
+      transition: width .3s;
+    }
+    .nav-links a:hover { color: var(--gold-lt); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-cta {
+      background: var(--gold); color: #0d0b09; padding: 10px 22px;
+      border-radius: 99px; text-decoration: none; font-weight: 600;
+      font-size: .88rem; letter-spacing: .03em;
+      transition: background .25s, transform .2s, box-shadow .25s;
+      box-shadow: 0 0 0 0 rgba(201,147,58,0);
+    }
+    .nav-cta:hover {
+      background: var(--gold-lt);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(201,147,58,.35);
+    }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: var(--cream); border-radius: 2px; transition: all .3s; }
+    .mobile-menu {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(13,11,9,.97); z-index: 99; flex-direction: column;
+      align-items: center; justify-content: center; gap: 40px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { font-size: 1.6rem; font-family: 'Playfair Display', serif; color: var(--cream); text-decoration: none; }
+    .mobile-menu a:hover { color: var(--gold); }
+    .mobile-close { position: absolute; top: 24px; right: 28px; font-size: 2rem; cursor: pointer; color: var(--cream-dim); }
+
+    /* ─── HERO ─── */
+    .hero {
+      min-height: 100vh;
+      display: grid; place-items: center;
+      position: relative; overflow: hidden;
+      padding: 120px 6% 80px;
+    }
+    .hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 70% 50%, rgba(201,147,58,.13) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 20% 80%, rgba(201,147,58,.07) 0%, transparent 55%),
+        #0d0b09;
+    }
+    .hero-bg::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(201,147,58,.03) 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(201,147,58,.03) 40px);
+    }
+    /* floating coffee bean blobs */
+    .blob {
+      position: absolute; border-radius: 50%;
+      background: radial-gradient(circle, rgba(201,147,58,.15), transparent 70%);
+      animation: floatBlob 8s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .blob1 { width: 500px; height: 500px; top: -100px; right: -80px; animation-delay: 0s; }
+    .blob2 { width: 300px; height: 300px; bottom: 60px; left: -60px; animation-delay: -3s; }
+    @keyframes floatBlob {
+      0%,100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-30px) scale(1.05); }
+    }
+
+    .hero-inner {
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 60px; align-items: center; max-width: 1160px; width: 100%;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(201,147,58,.12); border: 1px solid var(--border);
+      border-radius: 99px; padding: 7px 18px;
+      font-size: .8rem; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--gold-lt); margin-bottom: 22px;
+      animation: fadeUp .7s ease both;
+    }
+    .hero-badge span { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; animation: pulse 2s ease infinite; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.3; } }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 5vw, 4.2rem);
+      line-height: 1.12;
+      color: var(--cream);
+      margin-bottom: 18px;
+      animation: fadeUp .7s .12s ease both;
+    }
+    .hero h1 em { font-style: italic; color: var(--gold); }
+    .hero-desc {
+      color: var(--text-dim); font-size: 1.05rem; line-height: 1.75;
+      max-width: 440px; margin-bottom: 38px;
+      animation: fadeUp .7s .22s ease both;
+    }
+    .hero-actions {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      animation: fadeUp .7s .32s ease both;
+    }
+    .btn-primary {
+      background: var(--gold); color: #0d0b09;
+      padding: 15px 32px; border-radius: 99px;
+      font-weight: 700; font-size: .95rem; letter-spacing: .02em;
+      text-decoration: none; transition: all .25s;
+      box-shadow: 0 8px 28px rgba(201,147,58,.3);
+    }
+    .btn-primary:hover { background: var(--gold-lt); transform: translateY(-2px); box-shadow: 0 14px 36px rgba(201,147,58,.45); }
+    .btn-ghost {
+      background: transparent; color: var(--cream);
+      padding: 14px 30px; border-radius: 99px;
+      font-weight: 500; font-size: .95rem;
+      text-decoration: none; border: 1px solid rgba(245,237,216,.2);
+      transition: all .25s;
+    }
+    .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+    .hero-stats {
+      display: flex; gap: 32px; margin-top: 50px;
+      animation: fadeUp .7s .42s ease both;
+    }
+    .stat { border-left: 2px solid var(--border); padding-left: 16px; }
+    .stat-num { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--gold); }
+    .stat-label { font-size: .78rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: .08em; }
+
+    /* hero visual */
+    .hero-visual {
+      display: flex; flex-direction: column; align-items: center; gap: 20px;
+      animation: fadeUp .7s .18s ease both;
+    }
+    .coffee-card-big {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px; padding: 36px;
+      width: 100%; max-width: 380px;
+      position: relative; overflow: hidden;
+    }
+    .coffee-card-big::before {
+      content: '';
+      position: absolute; top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(201,147,58,.18), transparent 65%);
+      border-radius: 50%;
+    }
+    .coffee-icon-big { font-size: 64px; margin-bottom: 16px; display: block; }
+    .coffee-card-big h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; color: var(--cream); margin-bottom: 8px;
+    }
+    .coffee-card-big p { font-size: .9rem; color: var(--text-dim); line-height: 1.6; }
+    .rating-row { display: flex; align-items: center; gap: 8px; margin-top: 18px; }
+    .stars { color: var(--gold); font-size: 1rem; letter-spacing: 2px; }
+    .rating-text { font-size: .85rem; color: var(--text-dim); }
+    .hero-mini-cards { display: flex; gap: 14px; width: 100%; max-width: 380px; }
+    .mini-card {
+      flex: 1; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 18px 14px; text-align: center;
+      transition: transform .25s, border-color .25s;
+    }
+    .mini-card:hover { transform: translateY(-4px); border-color: var(--gold); }
+    .mini-card-icon { font-size: 1.6rem; margin-bottom: 8px; }
+    .mini-card-text { font-size: .78rem; color: var(--text-dim); line-height: 1.4; }
+    .mini-card-val { font-size: .95rem; font-weight: 600; color: var(--cream); }
+
+    @keyframes fadeUp { from { opacity:0; transform: translateY(24px); } to { opacity:1; transform:none; } }
+
+    /* ─── SECTION COMMONS ─── */
+    section { padding: 100px 6%; }
+    .section-tag {
+      display: inline-block;
+      font-size: .75rem; text-transform: uppercase; letter-spacing: .15em;
+      color: var(--gold); margin-bottom: 14px; font-weight: 600;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 3.5vw, 2.8rem);
+      color: var(--cream); line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .section-title em { font-style: italic; color: var(--gold); }
+    .section-desc { color: var(--text-dim); font-size: 1rem; line-height: 1.75; max-width: 520px; }
+    .section-center { text-align: center; }
+    .section-center .section-desc { margin: 0 auto; }
+
+    /* ─── ABOUT ─── */
+    .about { background: var(--bg2); }
+    .about-inner {
+      max-width: 1160px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+    }
+    .about-visual { position: relative; }
+    .about-img-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px; padding: 50px;
+      text-align: center; font-size: 6rem;
+      position: relative; overflow: hidden;
+    }
+    .about-img-box::after {
+      content: '';
+      position: absolute; bottom: -40px; right: -40px;
+      width: 180px; height: 180px;
+      background: radial-gradient(circle, rgba(201,147,58,.2), transparent 65%);
+      border-radius: 50%;
+    }
+    .about-tag-float {
+      position: absolute; top: -20px; right: -20px;
+      background: var(--gold); color: #0d0b09;
+      border-radius: 16px; padding: 12px 18px;
+      font-weight: 700; font-size: .9rem; text-align: center;
+      box-shadow: 0 8px 24px rgba(201,147,58,.4);
+    }
+    .about-tag-float span { display: block; font-size: .7rem; font-weight: 500; opacity: .7; }
+    .about-features {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 32px;
+    }
+    .feature-pill {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px;
+      display: flex; align-items: center; gap: 12px;
+      transition: border-color .25s, transform .25s;
+    }
+    .feature-pill:hover { border-color: var(--gold); transform: translateY(-3px); }
+    .feature-pill-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .feature-pill-text { font-size: .85rem; color: var(--text-dim); line-height: 1.4; }
+    .feature-pill-text strong { display: block; color: var(--cream); font-size: .9rem; margin-bottom: 2px; }
+
+    /* ─── MENU ─── */
+    .menu { background: var(--bg); }
+    .menu-inner { max-width: 1160px; margin: 0 auto; }
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px; margin-top: 60px;
+    }
+    .menu-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 30px 26px;
+      position: relative; overflow: hidden;
+      transition: transform .3s, border-color .3s, box-shadow .3s;
+      cursor: default;
+    }
+    .menu-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      transform: scaleX(0); transition: transform .4s;
+    }
+    .menu-card:hover { transform: translateY(-6px); border-color: rgba(201,147,58,.4); box-shadow: 0 24px 48px rgba(0,0,0,.5); }
+    .menu-card:hover::before { transform: scaleX(1); }
+    .menu-card-emoji { font-size: 2.4rem; margin-bottom: 16px; display: block; }
+    .menu-card-cat {
+      font-size: .7rem; text-transform: uppercase; letter-spacing: .12em;
+      color: var(--gold); margin-bottom: 8px; font-weight: 600;
+    }
+    .menu-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem; color: var(--cream); margin-bottom: 8px;
+    }
+    .menu-card-desc { font-size: .85rem; color: var(--text-dim); line-height: 1.6; margin-bottom: 20px; }
+    .menu-card-footer { display: flex; align-items: center; justify-content: space-between; }
+    .menu-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; color: var(--gold-lt);
+    }
+    .menu-price small { font-family: 'DM Sans', sans-serif; font-size: .75rem; color: var(--text-dim); margin-right: 2px; }
+    .menu-tag {
+      font-size: .72rem; background: rgba(201,147,58,.12);
+      border: 1px solid var(--border); color: var(--gold);
+      padding: 5px 12px; border-radius: 99px; letter-spacing: .05em;
+    }
+
+    /* ─── HOURS STRIP ─── */
+    .hours-strip {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 50px 6%;
+    }
+    .hours-inner {
+      max-width: 1160px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 30px; flex-wrap: wrap;
+    }
+    .hours-left h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem; color: var(--cream); margin-bottom: 6px;
+    }
+    .hours-left p { color: var(--text-dim); font-size: .9rem; }
+    .hours-pills { display: flex; gap: 16px; flex-wrap: wrap; }
+    .hours-pill {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 18px 24px;
+      min-width: 180px;
+    }
+    .hours-pill-day { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--gold); font-weight: 600; margin-bottom: 6px; }
+    .hours-pill-time { font-size: .95rem; color: var(--cream); font-weight: 500; }
+    .open-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(74,222,128,.1); border: 1px solid rgba(74,222,128,.25);
+      border-radius: 99px; padding: 8px 18px;
+      font-size: .82rem; color: #4ade80; font-weight: 600;
+    }
+    .open-dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; animation: pulse 2s ease infinite; }
+
+    /* ─── CONTACT ─── */
+    .contact { background: var(--bg2); }
+    .contact-inner {
+      max-width: 1160px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1.2fr; gap: 60px; align-items: start;
+    }
+    .contact-cards { display: flex; flex-direction: column; gap: 18px; margin-top: 40px; }
+    .contact-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 22px 24px;
+      display: flex; align-items: flex-start; gap: 18px;
+      transition: border-color .25s, transform .25s;
+    }
+    .contact-card:hover { border-color: var(--gold); transform: translateX(4px); }
+    .contact-card-icon {
+      width: 46px; height: 46px; background: rgba(201,147,58,.12);
+      border-radius: 12px; display: grid; place-items: center;
+      font-size: 1.3rem; flex-shrink: 0;
+    }
+    .contact-card-label { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--gold); margin-bottom: 4px; }
+    .contact-card-val { font-size: .95rem; color: var(--cream); line-height: 1.6; font-weight: 500; }
+    .contact-card-sub { font-size: .82rem; color: var(--text-dim); margin-top: 2px; }
+
+    .contact-cta-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px; padding: 50px 40px;
+      text-align: center;
+    }
+    .contact-cta-box h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem; color: var(--cream); margin-bottom: 12px;
+    }
+    .contact-cta-box p { color: var(--text-dim); font-size: .95rem; line-height: 1.7; margin-bottom: 32px; }
+    .contact-actions { display: flex; flex-direction: column; gap: 14px; }
+    .cta-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 16px 24px; border-radius: 14px; text-decoration: none;
+      font-weight: 600; font-size: .95rem; transition: all .25s;
+    }
+    .cta-call {
+      background: var(--gold); color: #0d0b09;
+      box-shadow: 0 8px 28px rgba(201,147,58,.3);
+    }
+    .cta-call:hover { background: var(--gold-lt); transform: translateY(-2px); box-shadow: 0 14px 36px rgba(201,147,58,.45); }
+    .cta-directions {
+      background: transparent; color: var(--cream);
+      border: 1px solid rgba(245,237,216,.18);
+    }
+    .cta-directions:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 50px 6% 32px;
+    }
+    .footer-inner {
+      max-width: 1160px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 24px; flex-wrap: wrap;
+    }
+    .footer-logo { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--cream); }
+    .footer-logo span { color: var(--gold); }
+    .footer-copy { font-size: .82rem; color: var(--text-dim); }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { font-size: .82rem; color: var(--text-dim); text-decoration: none; transition: color .2s; }
+    .footer-links a:hover { color: var(--gold); }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 960px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-visual { display: none; }
+      .about-inner { grid-template-columns: 1fr; gap: 50px; }
+      .contact-inner { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 680px) {
+      nav { padding: 16px 5%; }
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: flex; }
+      section { padding: 80px 5%; }
+      .hero { padding: 100px 5% 70px; }
+      .about-features { grid-template-columns: 1fr; }
+      .hours-inner { flex-direction: column; align-items: flex-start; }
+      .menu-grid { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; text-align: center; }
+      .footer-links { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-icon">☕</div>
+    <span class="nav-logo-text">Coffee Country</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#hours">Hours</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="tel:+916002908538" class="nav-cta">Call Now</a>
+  <div class="hamburger" id="hamburger" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <div class="mobile-close" id="mobileClose">✕</div>
+  <a href="#about" class="mm-link">About</a>
+  <a href="#menu" class="mm-link">Menu</a>
+  <a href="#hours" class="mm-link">Hours</a>
+  <a href="#contact" class="mm-link">Contact</a>
+  <a href="tel:+916002908538" class="btn-primary" style="font-size:1rem;padding:14px 36px;">📞 Call Now</a>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg">
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+  </div>
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-badge"><span></span>Now Open in Guwahati</div>
+      <h1>Where Every Sip<br>Tells a <em>Story.</em></h1>
+      <p class="hero-desc">
+        A cozy corner in the heart of Garchuk — crafted for students, dreamers, and coffee lovers. 
+        Affordable brews, warm vibes, and a peaceful escape from the everyday.
+      </p>
+      <div class="hero-actions">
+        <a href="#menu" class="btn-primary">Explore Menu</a>
+        <a href="#contact" class="btn-ghost">Visit Us →</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-num">4.7⭐</div>
+          <div class="stat-label">Customer Rating</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">₹100+</div>
+          <div class="stat-label">Starts From</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">5+</div>
+          <div class="stat-label">Menu Items</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="coffee-card-big">
+        <span class="coffee-icon-big">☕</span>
+        <h3>Signature Cappuccino</h3>
+        <p>Rich espresso topped with velvety foam — our most-loved classic, crafted fresh for every cup.</p>
+        <div class="rating-row">
+          <span class="stars">★★★★★</span>
+          <span class="rating-text">4.7 · Most Ordered</span>
+        </div>
+      </div>
+      <div class="hero-mini-cards">
+        <div class="mini-card">
+          <div class="mini-card-icon">🕐</div>
+          <div class="mini-card-val">12 hrs</div>
+          <div class="mini-card-text">Open daily<br>(Mon–Sat)</div>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-icon">📍</div>
+          <div class="mini-card-val">Garchuk</div>
+          <div class="mini-card-text">Katahbari<br>Main Road</div>
+        </div>
+        <div class="mini-card">
+          <div class="mini-card-icon">💰</div>
+          <div class="mini-card-val">₹100–200</div>
+          <div class="mini-card-text">Affordable<br>for all</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="about-inner">
+    <div class="about-visual">
+      <div class="about-img-box">
+        ☕
+        <div class="about-tag-float">
+          4.7 ⭐
+          <span>Customer Rating</span>
+        </div>
+      </div>
+      <div class="about-features">
+        <div class="feature-pill">
+          <div class="feature-pill-icon">🌿</div>
+          <div class="feature-pill-text">
+            <strong>Peaceful Ambience</strong>
+            Quiet space, perfect for studying or relaxing
+          </div>
+        </div>
+        <div class="feature-pill">
+          <div class="feature-pill-icon">💸</div>
+          <div class="feature-pill-text">
+            <strong>Student Friendly</strong>
+            Quality coffee at pocket-friendly prices
+          </div>
+        </div>
+        <div class="feature-pill">
+          <div class="feature-pill-icon">😊</div>
+          <div class="feature-pill-text">
+            <strong>Friendly Staff</strong>
+            Warm service that makes you feel at home
+          </div>
+        </div>
+        <div class="feature-pill">
+          <div class="feature-pill-icon">📍</div>
+          <div class="feature-pill-text">
+            <strong>Easy to Find</strong>
+            Opposite DY365, Garchuk, Guwahati
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-content">
+      <div class="section-tag">Our Story</div>
+      <h2 class="section-title">A Local Gem in<br><em>Guwahati's Heart</em></h2>
+      <p class="section-desc" style="margin-bottom:20px;">
+        Coffee Country was born from a simple belief — great coffee doesn't have to be expensive, 
+        and a great café doesn't need to be fancy. Nestled along Katahbari Main Road, Garchuk, 
+        we've become the go-to spot for Guwahati's students and locals.
+      </p>
+      <p class="section-desc">
+        Whether you're catching up with friends, cracking open a textbook, or simply craving 
+        a warm cup on a rainy Assam afternoon — Coffee Country is your place. Every cup is 
+        made with care, every smile is genuine, and every visit feels like coming home.
+      </p>
+      <div style="margin-top:36px; display:flex; gap:14px; flex-wrap:wrap;">
+        <a href="tel:+916002908538" class="btn-primary">📞 Call Now</a>
+        <a href="#menu" class="btn-ghost">See Menu</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MENU -->
+<section class="menu" id="menu">
+  <div class="menu-inner">
+    <div class="section-center">
+      <div class="section-tag">What We Serve</div>
+      <h2 class="section-title">Our <em>Menu</em></h2>
+      <p class="section-desc">Hand-crafted drinks and fresh bites — made to satisfy every craving, priced for every pocket.</p>
+    </div>
+    <div class="menu-grid">
+
+      <div class="menu-card">
+        <span class="menu-card-emoji">☕</span>
+        <div class="menu-card-cat">Coffee</div>
+        <h3>Cappuccino</h3>
+        <p class="menu-card-desc">Classic espresso balanced with steamed milk and a thick layer of microfoam. Our signature crowd-pleaser.</p>
+        <div class="menu-card-footer">
+          <div class="menu-price"><small>₹</small>120</div>
+          <div class="menu-tag">Best Seller</div>
+        </div>
+      </div>
+
+      <div class="menu-card">
+        <span class="menu-card-emoji">🥛</span>
+        <div class="menu-card-cat">Coffee</div>
+        <h3>Latte</h3>
+        <p class="menu-card-desc">Smooth espresso with creamy steamed milk — a gentle, comforting brew for every mood.</p>
+        <div class="menu-card-footer">
+          <div class="menu-price"><small>₹</small>140</div>
+          <div class="menu-tag">Popular</div>
+        </div>
+      </div>
+
+      <div class="menu-card">
+        <span class="menu-card-emoji">🧊</span>
+        <div class="menu-card-cat">Cold Drinks</div>
+        <h3>Cold Coffee</h3>
+        <p class="menu-card-desc">Chilled, rich, and refreshing — blended espresso with cold milk over ice. Perfect for Guwahati's warm days.</p>
+        <div class="menu-card-footer">
+          <div class="menu-price"><small>₹</small>150</div>
+          <div class="menu-tag">Refreshing</div>
+        </div>
+      </div>
+
+      <div class="menu-card">
+        <span class="menu-card-emoji">🥪</span>
+        <div class="menu-card-cat">Bites</div>
+        <h3>Sandwich</h3>
+        <p class="menu-card-desc">Fresh, toasted sandwiches loaded with flavourful fillings — the perfect companion to your coffee.</p>
+        <div class="menu-card-footer">
+          <div class="menu-price"><small>₹</small>100</div>
+          <div class="menu-tag">Fresh</div>
+        </div>
+      </div>
+
+      <div class="menu-card">
+        <span class="menu-card-emoji">🍔</span>
+        <div class="menu-card-cat">Bites</div>
+        <h3>Burger</h3>
+        <p class="menu-card-desc">Juicy, satisfying burgers stacked with all the good stuff — a hearty bite that keeps you going.</p>
+        <div class="menu-card-footer">
+          <div class="menu-price"><small>₹</small>130</div>
+          <div class="menu-tag">Filling</div>
+        </div>
+      </div>
+
+      <!-- CTA card -->
+      <div class="menu-card" style="background: rgba(201,147,58,.08); border-color: rgba(201,147,58,.3); display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; gap:12px;">
+        <div style="font-size:2.4rem;">🍽️</div>
+        <h3 style="font-family:'Playfair Display',serif; color:var(--cream); font-size:1.25rem;">More on the Menu</h3>
+        <p style="font-size:.85rem; color:var(--text-dim); line-height:1.6;">Visit us in person or call to know today's specials and seasonal offerings.</p>
+        <a href="tel:+916002908538" class="btn-primary" style="margin-top:6px; font-size:.88rem; padding:12px 26px;">📞 Ask Us</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- HOURS STRIP -->
+<div class="hours-strip" id="hours">
+  <div class="hours-inner">
+    <div class="hours-left">
+      <h2>Opening Hours</h2>
+      <p>Come find us — we're almost always open!</p>
+      <div style="margin-top:14px;">
+        <div class="open-badge"><div class="open-dot"></div> Open Today</div>
+      </div>
+    </div>
+    <div class="hours-pills">
+      <div class="hours-pill">
+        <div class="hours-pill-day">Mon – Sat</div>
+        <div class="hours-pill-time">9:30 AM – 9:30 PM</div>
+      </div>
+      <div class="hours-pill">
+        <div class="hours-pill-day">Sunday</div>
+        <div class="hours-pill-time">5:00 PM – 9:30 PM</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="contact-inner">
+    <div>
+      <div class="section-tag">Find Us</div>
+      <h2 class="section-title">Come Visit<br><em>Coffee Country</em></h2>
+      <p class="section-desc">We're easy to find and even easier to love. Drop in, say hi, and let us pour you a great cup.</p>
+
+      <div class="contact-cards">
+        <div class="contact-card">
+          <div class="contact-card-icon">📍</div>
+          <div>
+            <div class="contact-card-label">Location</div>
+            <div class="contact-card-val">Katahbari Main Road, Opposite DY365</div>
+            <div class="contact-card-sub">Behind Hotel Parashuram, Garchuk, Guwahati, Assam</div>
+          </div>
+        </div>
+        <div class="contact-card">
+          <div class="contact-card-icon">📞</div>
+          <div>
+            <div class="contact-card-label">Phone</div>
+            <div class="contact-card-val">+91 60029 08538</div>
+            <div class="contact-card-sub">Call us for inquiries or reservations</div>
+          </div>
+        </div>
+        <div class="contact-card">
+          <div class="contact-card-icon">🕐</div>
+          <div>
+            <div class="contact-card-label">Hours</div>
+            <div class="contact-card-val">Mon–Sat: 9:30 AM – 9:30 PM</div>
+            <div class="contact-card-sub">Sunday: 5:00 PM – 9:30 PM</div>
+          </div>
+        </div>
+        <div class="contact-card">
+          <div class="contact-card-icon">💰</div>
+          <div>
+            <div class="contact-card-label">Price Range</div>
+            <div class="contact-card-val">₹100 – ₹200 per person</div>
+            <div class="contact-card-sub">Affordable for students and everyone</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-cta-box">
+      <div style="font-size:3.5rem; margin-bottom:20px;">☕</div>
+      <h3>Ready for a Great Cup?</h3>
+      <p>
+        Skip the search and come straight to us. Whether you want to call ahead, 
+        check today's specials, or just drop in — we're here for you.
+      </p>
+      <div class="contact-actions">
+        <a href="tel:+916002908538" class="cta-btn cta-call">
+          📞 Call Now — +91 60029 08538
+        </a>
+        <a href="https://www.google.com/maps/search/Katahbari+Main+Road+Garchuk+Guwahati" target="_blank" rel="noopener" class="cta-btn cta-directions">
+          📍 Get Directions
+        </a>
+      </div>
+      <div style="margin-top:28px; padding-top:24px; border-top:1px solid var(--border);">
+        <div style="font-size:.82rem; color:var(--text-dim); line-height:1.6;">
+          Behind Hotel Parashuram · Garchuk · Guwahati, Assam<br>
+          <span style="color:var(--gold);">Rated 4.7 ⭐ by our customers</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo">Coffee <span>Country</span></div>
+      <div style="font-size:.8rem; color:var(--text-dim); margin-top:6px;">Garchuk, Guwahati, Assam</div>
+    </div>
+    <div class="footer-copy">© 2025 Coffee Country. All rights reserved.</div>
+    <div class="footer-links">
+      <a href="#home">Home</a>
+      <a href="#menu">Menu</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Navbar scroll
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // Mobile menu
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  const mobileClose = document.getElementById('mobileClose');
+  hamburger.addEventListener('click', () => mobileMenu.classList.add('open'));
+  mobileClose.addEventListener('click', () => mobileMenu.classList.remove('open'));
+  document.querySelectorAll('.mm-link').forEach(link => {
+    link.addEventListener('click', () => mobileMenu.classList.remove('open'));
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.menu-card, .feature-pill, .contact-card, .hours-pill').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity .5s ease, transform .5s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
